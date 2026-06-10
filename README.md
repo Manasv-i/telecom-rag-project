@@ -17,5 +17,5 @@ Day 1 Progress
 
 - Implemented RecursiveCharacterTextSplitter
 - Chunked extracted PDF text
-- Generated 12 chunks from telecom document
+- Generated 12 chunks from telecom test document
 - Learned chunk size and overlap concepts
