@@ -1,21 +1,66 @@
 # Telecom RAG Assistant
 
-Day 1 Progress
+## Overview
 
-## Features
-- FastAPI backend
-- PDF upload endpoint
-- PDF text extraction using PyPDF
-- Swagger API documentation
+A Retrieval-Augmented Generation (RAG) system for telecom documents that enables semantic search and context-aware information retrieval using AI.
 
 ## Tech Stack
-- FastAPI
-- Python
-- PyPDF
 
- Day 2 Progress
+* Python
+* FastAPI
+* PyPDF
+* LangChain
+* Sentence Transformers
+* Scikit-learn
+* Git & GitHub
 
-- Implemented RecursiveCharacterTextSplitter
-- Chunked extracted PDF text
-- Generated 12 chunks from telecom test document
-- Learned chunk size and overlap concepts
+---
+
+## Day 1: Backend & Document Processing
+
+### Implemented
+
+* FastAPI backend setup
+* PDF upload API
+* PDF text extraction using PyPDF
+* API testing with Swagger UI
+
+### Learned
+
+* FastAPI fundamentals
+* REST APIs
+* File handling in backend systems
+
+---
+
+## Day 2: Document Chunking
+
+### Implemented
+
+* Text chunking using RecursiveCharacterTextSplitter
+* Chunk size and overlap configuration
+* Generated searchable chunks from telecom documents
+
+### Learned
+
+* Document preprocessing
+* Chunking strategies for RAG systems
+
+---
+
+## Day 3: Semantic Retrieval
+
+### Implemented
+
+* Sentence embeddings using all-MiniLM-L6-v2
+* Cosine similarity-based semantic search
+* Retrieval of relevant document chunks for user queries
+
+### Learned
+
+* Embeddings
+* Semantic search
+* Retrieval component of RAG
+
+---
+
