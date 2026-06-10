@@ -13,7 +13,7 @@ Day 1 Progress
 - Python
 - PyPDF
 
-## Day 2 Progress
+ Day 2 Progress
 
 - Implemented RecursiveCharacterTextSplitter
 - Chunked extracted PDF text
