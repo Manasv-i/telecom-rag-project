@@ -64,3 +64,16 @@ A Retrieval-Augmented Generation (RAG) system for telecom documents that enables
 
 ---
 
+## Day 4: Vector Database
+
+### Implemented
+* Integrated ChromaDB for vector storage
+* Stored document chunks persistently
+* Implemented semantic retrieval using ChromaDB
+* Retrieved relevant chunks without reprocessing PDFs
+
+### Learned
+* Vector databases
+* Persistent embedding storage
+* Efficient semantic retrieval
+* Difference between in-memory search and vector databases
