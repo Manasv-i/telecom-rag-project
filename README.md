@@ -77,3 +77,36 @@ A Retrieval-Augmented Generation (RAG) system for telecom documents that enables
 * Persistent embedding storage
 * Efficient semantic retrieval
 * Difference between in-memory search and vector databases
+
+  ---
+
+## Day 5: Project Refactoring
+
+### Implemented
+* Modular project structure
+* Separated ingestion and retrieval logic
+* Organized experimental scripts
+* Added `.gitignore`
+* Added `requirements.txt`
+
+### Project Structure
+
+```text
+telecom-rag-project/
+│
+├── app/
+│   ├── ingest.py
+│   └── retrieve.py
+│
+├── experiments/
+│   ├── chroma_test.py
+│   ├── embeddings_test.py
+│   ├── pdf_chunking.py
+│   ├── semantic_search.py
+│   ├── similarity_test.py
+│   └── test_chunking.py
+│
+├── requirements.txt
+├── test_app.py
+├── main.py
+└── README.md
