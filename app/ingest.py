@@ -16,7 +16,6 @@ def ingest_pdf(pdf_path):
         if extracted:
             text += extracted
 
-    # Chunking
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=500,
         chunk_overlap=50
@@ -26,26 +25,27 @@ def ingest_pdf(pdf_path):
 
     print("Chunks:", len(chunks))
 
-    # ChromaDB
     client = chromadb.PersistentClient(
         path="./chroma_db"
     )
 
-    # Delete old collection if exists
     try:
         client.delete_collection("telecom_docs")
     except:
         pass
 
-    # Create fresh collection
     collection = client.create_collection(
         name="telecom_docs"
     )
 
-    # Store chunks
     collection.add(
         documents=chunks,
         ids=[f"chunk_{i}" for i in range(len(chunks))]
     )
 
     print("Stored Successfully")
+
+
+# OUTSIDE THE FUNCTION
+if __name__ == "__main__":
+    ingest_pdf("RANovate AI.pdf")
