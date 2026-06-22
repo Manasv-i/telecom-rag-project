@@ -110,3 +110,40 @@ telecom-rag-project/
 ├── test_app.py
 ├── main.py
 └── README.md
+```
+
+# Day 6 – Gemini Integration & Complete RAG Pipeline
+
+## What I Learned
+
+* Integrated Google Gemini API into the Telecom RAG Assistant.
+* Connected retrieval and generation components to create a complete Retrieval-Augmented Generation (RAG) workflow.
+* Learned prompt engineering using retrieved context.
+* Understood how LLMs use retrieved documents to generate grounded responses.
+
+## What I Built
+
+* Created `generate.py` for Gemini-based answer generation.
+* Connected ChromaDB retrieval with Gemini generation.
+* Built an end-to-end pipeline:
+
+  * Query → Retrieval → Context → Gemini → Answer
+* Tested the pipeline using telecom-related questions.
+
+## Results
+
+Successfully generated answers from retrieved telecom documents instead of directly querying the LLM.
+
+Example:
+Question: "What telecom datasets are used?"
+
+Answer:
+
+* TeleQnA Dataset
+* O-RAN Dataset
+* Simu5G Data
+* 3GPP Release 16 & 18 Docs
+
+## Key Takeaway
+
+Today I completed the core RAG architecture by combining document retrieval with LLM-based answer generation, creating a functional Telecom RAG Assistant prototype.
