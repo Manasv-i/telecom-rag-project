@@ -16,7 +16,7 @@ A Retrieval-Augmented Generation (RAG) system for telecom documents that enables
 
 ---
 
-## Day 1: Backend & Document Processing
+# Day 1: Backend & Document Processing
 
 ### Implemented
 
@@ -33,7 +33,7 @@ A Retrieval-Augmented Generation (RAG) system for telecom documents that enables
 
 ---
 
-## Day 2: Document Chunking
+# Day 2: Document Chunking
 
 ### Implemented
 
@@ -48,7 +48,7 @@ A Retrieval-Augmented Generation (RAG) system for telecom documents that enables
 
 ---
 
-## Day 3: Semantic Retrieval
+# Day 3: Semantic Retrieval
 
 ### Implemented
 
@@ -64,7 +64,7 @@ A Retrieval-Augmented Generation (RAG) system for telecom documents that enables
 
 ---
 
-## Day 4: Vector Database
+# Day 4: Vector Database
 
 ### Implemented
 * Integrated ChromaDB for vector storage
@@ -80,7 +80,7 @@ A Retrieval-Augmented Generation (RAG) system for telecom documents that enables
 
   ---
 
-## Day 5: Project Refactoring
+# Day 5: Project Refactoring
 
 ### Implemented
 * Modular project structure
@@ -114,14 +114,14 @@ telecom-rag-project/
 
 # Day 6 – Gemini Integration & Complete RAG Pipeline
 
-## What I Learned
+### What I Learned
 
 * Integrated Google Gemini API into the Telecom RAG Assistant.
 * Connected retrieval and generation components to create a complete Retrieval-Augmented Generation (RAG) workflow.
 * Learned prompt engineering using retrieved context.
 * Understood how LLMs use retrieved documents to generate grounded responses.
 
-## What I Built
+### What I Built
 
 * Created `generate.py` for Gemini-based answer generation.
 * Connected ChromaDB retrieval with Gemini generation.
@@ -130,7 +130,7 @@ telecom-rag-project/
   * Query → Retrieval → Context → Gemini → Answer
 * Tested the pipeline using telecom-related questions.
 
-## Results
+### Results
 
 Successfully generated answers from retrieved telecom documents instead of directly querying the LLM.
 
@@ -144,11 +144,11 @@ Answer:
 * Simu5G Data
 * 3GPP Release 16 & 18 Docs
 
-## Key Takeaway
+### Key Takeaway
 
 Today I completed the core RAG architecture by combining document retrieval with LLM-based answer generation, creating a functional Telecom RAG Assistant prototype.
 
-## Day 7 – Dockerization
+# Day 7 – Dockerization
 
 ### What I Learned
 * Docker basics
@@ -174,7 +174,7 @@ docker build -t telecom-rag .
 ---
 
 
-## Day 8 – End-to-End RAG API Deployment
+# Day 8 – End-to-End RAG API Deployment
 
 ### What I Learned
 - FastAPI endpoint integration
@@ -204,3 +204,66 @@ User Query
 * Retrieval-Augmented Generation working successfully
 * API tested through FastAPI Swagger UI
 * Fully functional inside Docker container
+
+# Day 9: Continuous Integration (CI) with GitHub Actions
+
+### Objective
+Automate project validation and Docker image building whenever new code is pushed to GitHub.
+
+### What I Learned
+- Basics of Continuous Integration (CI)
+- GitHub Actions workflows
+- Automating dependency installation
+- Running validation checks in CI
+- Automated Docker image building
+
+## Tasks Completed
+
+### Created GitHub Actions Workflow
+
+Created:
+
+.github/workflows/ci.yml
+
+### Configured CI Pipeline
+
+Workflow automatically triggers on:
+
+- Push to main branch
+- Pull requests to main branch
+
+### Automated Steps
+
+The pipeline performs:
+
+1. Repository Checkout
+2. Python Environment Setup
+3. Dependency Installation
+4. FastAPI Import Verification
+5. ChromaDB Import Verification
+6. Application Import Verification
+7. Docker Image Build
+
+### CI Validation
+
+Successfully verified:
+
+- FastAPI imports
+- ChromaDB imports
+- Application modules
+- Docker image creation
+
+### GitHub Actions Result
+
+Pipeline completed successfully with all jobs passing.
+
+## Outcome
+
+Implemented a fully automated CI pipeline that validates the project and builds a Docker image on every code change.
+
+## Technologies Used
+
+- GitHub Actions
+- Docker
+- Python
+- FastAPI
