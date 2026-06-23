@@ -16,10 +16,4 @@ def search(query):
         n_results=2
     )
 
-    print("\nRetrieved Chunks:\n")
-
-    for doc in results["documents"][0]:
-        print("-" * 50)
-        print(doc)
-
     return results

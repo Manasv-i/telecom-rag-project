@@ -1,8 +1,15 @@
 from fastapi import FastAPI, UploadFile, File
-from pypdf import PdfReader
-import io
+from pydantic import BaseModel
+import shutil
+
+from app.retrieve import search
+from app.generate import generate_answer
 
 app = FastAPI()
+
+
+class QueryRequest(BaseModel):
+    query: str
 
 
 @app.get("/")
@@ -12,24 +19,37 @@ def home():
     }
 
 
-@app.post("/upload")
-async def upload_pdf(file: UploadFile = File(...)):
+@app.post("/ask")
+def ask_question(request: QueryRequest):
 
-    pdf_bytes = await file.read()
+    results = search(request.query)
 
-    pdf_reader = PdfReader(io.BytesIO(pdf_bytes))
+    context = "\n".join(
+        results["documents"][0]
+    )
 
-    text = ""
-
-    for page in pdf_reader.pages:
-        extracted = page.extract_text()
-
-        if extracted:
-            text += extracted
+    answer = generate_answer(
+        context,
+        request.query
+    )
 
     return {
-        "filename": file.filename,
-        "pages": len(pdf_reader.pages),
-        "characters": len(text),
-        "preview": text[:500]
+        "query": request.query,
+        "answer": answer
+    }
+
+@app.post("/upload")
+def upload_pdf(file: UploadFile = File(...)):
+
+    file_path = file.filename
+
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    from app.ingest import ingest_pdf
+
+    ingest_pdf(file_path)
+
+    return {
+        "message": f"{file.filename} uploaded and indexed successfully"
     }
