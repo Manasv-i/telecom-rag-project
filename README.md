@@ -147,3 +147,60 @@ Answer:
 ## Key Takeaway
 
 Today I completed the core RAG architecture by combining document retrieval with LLM-based answer generation, creating a functional Telecom RAG Assistant prototype.
+
+## Day 7 – Dockerization
+
+### What I Learned
+* Docker basics
+* Dockerfile creation
+* Containerizing FastAPI applications
+* Environment variable handling in Docker
+* Building and running Docker images
+
+### What I Implemented
+- Created a Dockerfile for the Telecom RAG Assistant
+- Added `.dockerignore` to reduce image size
+- Built Docker image using:
+
+```bash
+docker build -t telecom-rag .
+```
+### Outcome
+* Successfully containerized the entire RAG application
+* FastAPI server running inside Docker
+* Gemini API accessible from container
+* ChromaDB retrieval working inside container
+
+---
+
+
+## Day 8 – End-to-End RAG API Deployment
+
+### What I Learned
+- FastAPI endpoint integration
+- Connecting Retrieval + Generation pipeline
+- Handling Docker runtime issues
+- Managing ChromaDB collections in containers
+
+### What I Implemented
+
+#### Query Endpoint
+Created `/ask` endpoint:
+
+```http
+POST /ask
+```
+
+### Workflow:
+
+User Query
+→ ChromaDB Retrieval
+→ Context Generation
+→ Gemini API
+→ Final Answer
+
+### Outcome
+* Complete end-to-end Telecom RAG pipeline operational
+* Retrieval-Augmented Generation working successfully
+* API tested through FastAPI Swagger UI
+* Fully functional inside Docker container
