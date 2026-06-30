@@ -33,10 +33,19 @@ def ask_question(request: QueryRequest):
         request.query
     )
 
+    sources = list(
+        set(
+            meta["source"]
+            for meta in results["metadatas"][0]
+        )
+    )
+
     return {
         "query": request.query,
-        "answer": answer
+        "answer": answer,
+        "sources": sources
     }
+
 
 @app.post("/upload")
 def upload_pdf(file: UploadFile = File(...)):
@@ -44,7 +53,10 @@ def upload_pdf(file: UploadFile = File(...)):
     file_path = file.filename
 
     with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+        shutil.copyfileobj(
+            file.file,
+            buffer
+        )
 
     from app.ingest import ingest_pdf
 

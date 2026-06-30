@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
-
 client = genai.Client(
     api_key=os.getenv("GEMINI_API_KEY")
 )
@@ -17,12 +16,23 @@ Context:
 Question:
 {query}
 
-Answer based only on the context above.
+Answer based only on the context.
 """
 
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt
-    )
+    try:
 
-    return response.text
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=prompt
+        )
+
+        return response.text
+
+    except Exception as e:
+
+        print(f"Gemini Error: {e}")
+
+        return (
+            "Gemini API unavailable. Returning retrieved context.\n\n"
+            + context[:2000]
+        )
