@@ -1,67 +1,68 @@
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, HTTPException
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import shutil
 
 from app.retrieve import search
 from app.generate import generate_answer
 
-app = FastAPI()
+app = FastAPI(title="Telecom RAG Assistant")
+
+# Allow the frontend (served from the same origin, but kept open for now
+# in case you host frontend/backend separately later)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 class QueryRequest(BaseModel):
     query: str
 
 
-@app.get("/")
-def home():
-    return {
-        "message": "Telecom RAG Assistant Running"
-    }
+@app.get("/api/health")
+def health():
+    return {"status": "ok", "message": "Telecom RAG Assistant Running"}
 
 
-@app.post("/ask")
+@app.post("/api/ask")
 def ask_question(request: QueryRequest):
 
-    results = search(request.query)
+    query = request.query.strip()
 
-    context = "\n".join(
-        results["documents"][0]
-    )
+    if not query:
+        raise HTTPException(status_code=400, detail="Query cannot be empty")
 
-    answer = generate_answer(
-        context,
-        request.query
-    )
+    results = search(query)
 
-    sources = list(
-        set(
-            meta["source"]
-            for meta in results["metadatas"][0]
-        )
-    )
+    documents = results.get("documents", [[]])[0]
+
+    if not documents:
+        return {
+            "query": query,
+            "answer": "I couldn't find anything relevant in the telecom knowledge base for that question.",
+            "sources": []
+        }
+
+    context = "\n".join(documents)
+
+    answer = generate_answer(context, query)
+
+    sources = sorted(set(
+        meta["source"]
+        for meta in results["metadatas"][0]
+    ))
 
     return {
-        "query": request.query,
+        "query": query,
         "answer": answer,
         "sources": sources
     }
 
 
-@app.post("/upload")
-def upload_pdf(file: UploadFile = File(...)):
-
-    file_path = file.filename
-
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(
-            file.file,
-            buffer
-        )
-
-    from app.ingest import ingest_pdf
-
-    ingest_pdf(file_path)
-
-    return {
-        "message": f"{file.filename} uploaded and indexed successfully"
-    }
+# Serve the frontend (static/index.html) at the root.
+# Mounted last so it doesn't shadow the /api routes above.
+app.mount("/", StaticFiles(directory="static", html=True), name="static")

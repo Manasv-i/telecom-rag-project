@@ -25,7 +25,7 @@ def search(query, source_type=None):
             query_embeddings=[
                 query_embedding.tolist()
             ],
-            n_results=3
+            n_results=6
         )
 
     else:
@@ -34,7 +34,7 @@ def search(query, source_type=None):
             query_embeddings=[
                 query_embedding.tolist()
             ],
-            n_results=3,
+            n_results=6,
             where={
                 "type": source_type
             }

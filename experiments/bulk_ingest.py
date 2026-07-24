@@ -1,5 +1,6 @@
 from app.document_loader import load_all_documents
 from app.chunker import chunk_text
+from app.glossary import extract_glossary_entries, glossary_entries_to_chunks
 
 import chromadb
 from sentence_transformers import SentenceTransformer
@@ -33,6 +34,23 @@ for document in documents:
             }
         )
 
+    # Glossary/abbreviation entries (e.g. "UPF\tUser Plane Function") get
+    # diluted when they're swept into generic 500-char chunks alongside
+    # many unrelated entries. Pulling them out as standalone chunks makes
+    # direct "What is X?" questions far more retrievable.
+    glossary_entries = extract_glossary_entries(document["text"])
+    glossary_chunks = glossary_entries_to_chunks(glossary_entries)
+
+    all_chunks.extend(glossary_chunks)
+
+    for _ in glossary_chunks:
+
+        all_metadata.append(
+            {
+                "source": document["source"],
+                "type": "glossary"
+            }
+        )
 
 print(f"Total Chunks: {len(all_chunks)}")
 

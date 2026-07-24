@@ -5,3 +5,14 @@ __pycache__/
 .env
 chroma_db/
 *.pyc
+*.pyo
+
+# not needed inside the image
+RANovate AI.pdf
+README.md
+.github/
+.dockerignore
+
+# legacy/standalone scripts, not used by the running app
+test_app.py
+rag_test.py
