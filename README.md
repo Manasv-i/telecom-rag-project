@@ -1,269 +1,162 @@
-# Telecom RAG Assistant
+# RANovate AI
 
-## Overview
+A domain-specific Retrieval-Augmented Generation (RAG) system for telecom knowledge, built to answer questions grounded in 3GPP specification documents — including notoriously tricky definitional queries like *"What is UPF?"*.
 
-A Retrieval-Augmented Generation (RAG) system for telecom documents that enables semantic search and context-aware information retrieval using AI.
+RANovate AI pairs an AI retrieval pipeline with a proper DevOps setup: containerized deployment, a curated dependency footprint, and a purpose-built glossary extractor that solves a real failure mode in generic chunking strategies.
+
+---
+
+## Why this exists
+
+Generic fixed-size chunking works fine for prose but falls apart on structured, abbreviation-heavy telecom specs. Standard RAG pipelines routinely fail on simple definitional questions because the abbreviation table gets diluted across chunk boundaries. RANovate AI fixes this with a dedicated glossary extraction stage, alongside a clean, minimal, deployable stack.
+
+---
+
+## Features
+
+- **Conversational Q&A over 3GPP specs** — ask telecom questions in plain English, get grounded answers with retrieved context
+- **Domain-aware chunking** — a dedicated glossary extractor (`app/glossary.py`) pulls abbreviation-format entries out of raw spec text using regex and indexes them as standalone `type: "glossary"` chunks, dramatically improving retrieval for "What is X?" style queries
+- **Gemini-powered generation** — uses `gemini-2.5-flash` for response generation
+- **ChromaDB vector store** — persistent local vector index, baked into the Docker image at build time
+- **Telecom NOC-console styled UI** — a chat-style frontend built from scratch to feel like an operator console
+- **Lightweight, production-minded Docker setup** — CPU-only PyTorch, `python:3.13-slim` base, and a trimmed dependency list (~13 packages, down from a bloated ~140-package `pip freeze` dump)
+
+---
+
+## Architecture
+
+```
+┌─────────────────┐      ┌──────────────┐      ┌────────────────┐
+│  Frontend (UI)   │ ───► │  FastAPI     │ ───► │  Gemini API     │
+│  static/index.html│     │  main.py     │      │ (gemini-2.5-flash)│
+└─────────────────┘      └──────┬───────┘      └────────────────┘
+                                  │
+                                  ▼
+                          ┌──────────────┐
+                          │  ChromaDB     │
+                          │  (retrieve.py)│
+                          └──────┬───────┘
+                                  │
+                          ┌──────▼───────┐
+                          │  Ingestion    │
+                          │  ingest.py    │
+                          │  glossary.py  │
+                          │  bulk_ingest.py│
+                          └──────────────┘
+```
+
+**Retrieval flow:** query → embed → ChromaDB top-6 similarity search (glossary chunks + regular spec chunks) → context assembly → Gemini generation → response.
+
+---
 
 ## Tech Stack
 
-* Python
-* FastAPI
-* PyPDF
-* LangChain
-* Sentence Transformers
-* Scikit-learn
-* Git & GitHub
+| Layer | Technology |
+|---|---|
+| Backend | Python, FastAPI |
+| Vector store | ChromaDB |
+| LLM | Google Gemini API (`gemini-2.5-flash`) |
+| Frontend | Static HTML/CSS (NOC-console aesthetic) |
+| Containerization | Docker (`python:3.13-slim`, CPU-only PyTorch) |
+| CI/CD | GitHub Actions *(in progress)* |
+| Deployment | AWS EC2, free tier *(in progress)*, GHCR for image hosting |
+| Data source | 3GPP specification documents |
 
 ---
 
-# Day 1: Backend & Document Processing
+## Project Structure
 
-### Implemented
-
-* FastAPI backend setup
-* PDF upload API
-* PDF text extraction using PyPDF
-* API testing with Swagger UI
-
-### Learned
-
-* FastAPI fundamentals
-* REST APIs
-* File handling in backend systems
-
----
-
-# Day 2: Document Chunking
-
-### Implemented
-
-* Text chunking using RecursiveCharacterTextSplitter
-* Chunk size and overlap configuration
-* Generated searchable chunks from telecom documents
-
-### Learned
-
-* Document preprocessing
-* Chunking strategies for RAG systems
-
----
-
-# Day 3: Semantic Retrieval
-
-### Implemented
-
-* Sentence embeddings using all-MiniLM-L6-v2
-* Cosine similarity-based semantic search
-* Retrieval of relevant document chunks for user queries
-
-### Learned
-
-* Embeddings
-* Semantic search
-* Retrieval component of RAG
-
----
-
-# Day 4: Vector Database
-
-### Implemented
-* Integrated ChromaDB for vector storage
-* Stored document chunks persistently
-* Implemented semantic retrieval using ChromaDB
-* Retrieved relevant chunks without reprocessing PDFs
-
-### Learned
-* Vector databases
-* Persistent embedding storage
-* Efficient semantic retrieval
-* Difference between in-memory search and vector databases
-
-  ---
-
-# Day 5: Project Refactoring
-
-### Implemented
-* Modular project structure
-* Separated ingestion and retrieval logic
-* Organized experimental scripts
-* Added `.gitignore`
-* Added `requirements.txt`
-
-### Project Structure
-
-```text
-telecom-rag-project/
-│
+```
+.
+├── main.py                  # FastAPI app entrypoint, static file mount
 ├── app/
-│   ├── ingest.py
-│   └── retrieve.py
-│
+│   ├── generate.py          # Gemini API call + generation logic
+│   ├── retrieve.py          # ChromaDB query/retrieval logic
+│   └── glossary.py          # Regex-based abbreviation extractor for glossary chunks
 ├── experiments/
-│   ├── chroma_test.py
-│   ├── embeddings_test.py
-│   ├── pdf_chunking.py
-│   ├── semantic_search.py
-│   ├── similarity_test.py
-│   └── test_chunking.py
-│
-├── requirements.txt
-├── test_app.py
-├── main.py
+│   ├── ingest.py            # Core ingestion pipeline
+│   └── bulk_ingest.py       # Bulk ingestion entrypoint (wires in glossary.py)
+├── static/
+│   └── index.html           # Chat-style frontend UI
+├── Dockerfile
+├── requirements.txt         # Curated, minimal dependency list
 └── README.md
 ```
 
-# Day 6 – Gemini Integration & Complete RAG Pipeline
+---
 
-### What I Learned
+## Getting Started
 
-* Integrated Google Gemini API into the Telecom RAG Assistant.
-* Connected retrieval and generation components to create a complete Retrieval-Augmented Generation (RAG) workflow.
-* Learned prompt engineering using retrieved context.
-* Understood how LLMs use retrieved documents to generate grounded responses.
+### Prerequisites
 
-### What I Built
+- Python 3.13+
+- Docker (recommended for consistent builds)
+- A Google Gemini API key
 
-* Created `generate.py` for Gemini-based answer generation.
-* Connected ChromaDB retrieval with Gemini generation.
-* Built an end-to-end pipeline:
-
-  * Query → Retrieval → Context → Gemini → Answer
-* Tested the pipeline using telecom-related questions.
-
-### Results
-
-Successfully generated answers from retrieved telecom documents instead of directly querying the LLM.
-
-Example:
-Question: "What telecom datasets are used?"
-
-Answer:
-
-* TeleQnA Dataset
-* O-RAN Dataset
-* Simu5G Data
-* 3GPP Release 16 & 18 Docs
-
-### Key Takeaway
-
-Today I completed the core RAG architecture by combining document retrieval with LLM-based answer generation, creating a functional Telecom RAG Assistant prototype.
-
-# Day 7 – Dockerization
-
-### What I Learned
-* Docker basics
-* Dockerfile creation
-* Containerizing FastAPI applications
-* Environment variable handling in Docker
-* Building and running Docker images
-
-### What I Implemented
-- Created a Dockerfile for the Telecom RAG Assistant
-- Added `.dockerignore` to reduce image size
-- Built Docker image using:
+### Local setup
 
 ```bash
-docker build -t telecom-rag .
+# Clone the repo
+git clone <your-repo-url>
+cd ranovate-ai
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Set your Gemini API key
+export GEMINI_API_KEY=your_key_here
+
+# Ingest documents (builds the ChromaDB index, including glossary extraction)
+python -m experiments.bulk_ingest
+
+# Run the app
+uvicorn main:app --reload
 ```
-### Outcome
-* Successfully containerized the entire RAG application
-* FastAPI server running inside Docker
-* Gemini API accessible from container
-* ChromaDB retrieval working inside container
+
+Visit `http://localhost:8000` to use the chat UI.
+
+### Docker
+
+```bash
+docker build -t ranovate-ai .
+docker run -p 8000:8000 -e GEMINI_API_KEY=your_key_here ranovate-ai
+```
+
+The ChromaDB index is baked into the image at build time, so the container is ready to serve queries immediately on startup — no cold-start ingestion delay.
 
 ---
 
+## Roadmap
 
-# Day 8 – End-to-End RAG API Deployment
+- [x] Fix ChromaDB collection name mismatch between ingest and retrieve
+- [x] Migrate to `gemini-2.5-flash` with proper error logging
+- [x] Trim requirements from ~140 to ~13 packages
+- [x] Build glossary extraction module for definitional query support
+- [x] Build chat-style NOC-console frontend
+- [x] Slim, CPU-only Docker build
+- [ ] AWS EC2 deployment with live URL
+- [ ] GitHub Actions CI/CD pipeline
+- [ ] Push images to GHCR
+- [ ] Multi-agent orchestration (v2)
+- [ ] Auth (v2)
+- [ ] Prometheus/Grafana monitoring (v2)
+- [ ] Advanced retrieval strategies (v2)
 
-### What I Learned
-- FastAPI endpoint integration
-- Connecting Retrieval + Generation pipeline
-- Handling Docker runtime issues
-- Managing ChromaDB collections in containers
+---
 
-### What I Implemented
+## Design Decisions
 
-#### Query Endpoint
-Created `/ask` endpoint:
+**Why a dedicated glossary extractor instead of smarter general-purpose chunking?**
+3GPP specs pack abbreviation tables densely, and generic fixed-size or sentence-based chunking splits or dilutes them, so retrieval for "What is X?" queries returned poor or irrelevant context. A regex-based extractor pulls these entries out as standalone chunks tagged `type: "glossary"`, so they're retrieved cleanly and independently of surrounding spec prose.
 
-```http
-POST /ask
-```
+**Why CPU-only PyTorch in Docker?**
+GPU-enabled PyTorch builds pull in multi-gigabyte CUDA dependencies that aren't needed for this workload and would make the image needlessly large and slow to build/deploy on free-tier infrastructure.
 
-### Workflow:
+**Why manually curate `requirements.txt` instead of using `pip freeze`?**
+`pip freeze` output tends to be bloated and fragile, pinning transitive dependencies unnecessarily and complicating Docker builds. A minimal, manually maintained list keeps builds fast and reproducible.
 
-User Query
-→ ChromaDB Retrieval
-→ Context Generation
-→ Gemini API
-→ Final Answer
+---
 
-### Outcome
-* Complete end-to-end Telecom RAG pipeline operational
-* Retrieval-Augmented Generation working successfully
-* API tested through FastAPI Swagger UI
-* Fully functional inside Docker container
+## License
 
-# Day 9: Continuous Integration (CI) with GitHub Actions
-
-### Objective
-Automate project validation and Docker image building whenever new code is pushed to GitHub.
-
-### What I Learned
-- Basics of Continuous Integration (CI)
-- GitHub Actions workflows
-- Automating dependency installation
-- Running validation checks in CI
-- Automated Docker image building
-
-## Tasks Completed
-
-### Created GitHub Actions Workflow
-
-Created:
-
-.github/workflows/ci.yml
-
-### Configured CI Pipeline
-
-Workflow automatically triggers on:
-
-- Push to main branch
-- Pull requests to main branch
-
-### Automated Steps
-
-The pipeline performs:
-
-1. Repository Checkout
-2. Python Environment Setup
-3. Dependency Installation
-4. FastAPI Import Verification
-5. ChromaDB Import Verification
-6. Application Import Verification
-7. Docker Image Build
-
-### CI Validation
-
-Successfully verified:
-
-- FastAPI imports
-- ChromaDB imports
-- Application modules
-- Docker image creation
-
-### GitHub Actions Result
-
-Pipeline completed successfully with all jobs passing.
-
-## Outcome
-
-Implemented a fully automated CI pipeline that validates the project and builds a Docker image on every code change.
-
-## Technologies Used
-
-- GitHub Actions
-- Docker
-- Python
-- FastAPI
+Add your license here.
