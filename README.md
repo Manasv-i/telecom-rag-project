@@ -97,7 +97,7 @@ Generic fixed-size chunking works fine for prose but falls apart on structured, 
 
 ```bash
 # Clone the repo
-git clone <your-repo-url>
+git clone https://github.com/Manasv-i/telecom-rag-project
 cd ranovate-ai
 
 # Install dependencies
@@ -156,7 +156,3 @@ GPU-enabled PyTorch builds pull in multi-gigabyte CUDA dependencies that aren't 
 `pip freeze` output tends to be bloated and fragile, pinning transitive dependencies unnecessarily and complicating Docker builds. A minimal, manually maintained list keeps builds fast and reproducible.
 
 ---
-
-## License
-
-Add your license here.
